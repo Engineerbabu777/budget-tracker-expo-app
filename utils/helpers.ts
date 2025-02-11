@@ -15,5 +15,7 @@ export const fetchUserProfile = async () => {
   
     const userData = await response.json();
     console.log("User Profile:", userData);
+
+    return userData;
   };
   

@@ -99,8 +99,9 @@ export default function LoginScreen() {
 
         // Fetch user profile
         const userProfile:any = await fetchUserProfile();
-        if (userProfile?.email) {
-          await setLocalStorage("user", userProfile);
+        console.log("you profile",userProfile)
+        if (userProfile?.preferred_email) {
+          await setLocalStorage("user-profile-budget-tracker", userProfile);
         }
 
         await store.setSessionItem(

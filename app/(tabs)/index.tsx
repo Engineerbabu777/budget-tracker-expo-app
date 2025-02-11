@@ -5,11 +5,12 @@ import { View, Text } from "react-native";
 
 export default function Home() {
   const getAllVategories = async () => {
-    const user: any = await getLocalStorage("user");
+    const user: any = await getLocalStorage("user-profile-budget-tracker");
+
     const { data, error } = await supabase
       .from("Category")
       .select("*")
-      .eq("created_by", user?.email);
+      .eq("created_by", user?.preferred_email);
     console.log(data, error, user);
   };
 
