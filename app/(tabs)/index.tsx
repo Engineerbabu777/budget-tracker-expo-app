@@ -1,7 +1,10 @@
+import Header from "@/components/header";
+import Colors from "@/utils/Colors";
 import { getLocalStorage } from "@/utils/services";
 import { supabase } from "@/utils/SupabseConfig";
 import React, { useEffect } from "react";
 import { View, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const getAllVategories = async () => {
@@ -18,8 +21,13 @@ export default function Home() {
     getAllVategories();
   }, []);
   return (
-    <View>
-      <Text>Home</Text>
-    </View>
+    <SafeAreaView
+    style={{
+      backgroundColor:Colors.Primary
+    }}
+    >
+      {/* Header! */}
+      <Header />
+    </SafeAreaView>
   );
 }
