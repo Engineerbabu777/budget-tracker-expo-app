@@ -1,17 +1,25 @@
 import { getLocalStorage } from "@/utils/services";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   const checkUser = async () => {
-    // check if user is logged in
-    const response = await getLocalStorage("login");
-    if (!response) {
-      router.replace("/login");
+    try {
+      const response = await getLocalStorage("login");
+
+      if (!response) {
+        router.replace("/login");
+      } else {
+        router.replace("/(tabs)");
+      }
+    } catch (error) {
+      console.error("Error checking user:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -19,16 +27,19 @@ export default function Index() {
     checkUser();
   }, []);
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Home Page</Text>
-    </View>
-  );
-}
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
+  return null; // No need to render anything since navigation happens before this.
+}
