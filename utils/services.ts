@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
  * @param key The key under which the value is stored.
  * @param value The value to be stored (must be serializable).
  */
-export const setLocalStorage = async (key: string, value: object): Promise<void> => {
+export const setLocalStorage = async (key: string, value: object | string): Promise<void> => {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
