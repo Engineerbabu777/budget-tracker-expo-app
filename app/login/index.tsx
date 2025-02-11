@@ -2,70 +2,79 @@ import Colors from "@/utils/Colors";
 import { useRouter } from "expo-router";
 import { Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from 'react';
-import { makeRedirectUri, AuthRequest, exchangeCodeAsync } from 'expo-auth-session';
+import { useState, useEffect } from "react";
+import {
+  makeRedirectUri,
+  AuthRequest,
+  exchangeCodeAsync,
+} from "expo-auth-session";
 import { maybeCompleteAuthSession } from "expo-web-browser";
-import { Text, View } from 'react-native';
+import { Text, View } from "react-native";
 import Constants from "expo-constants";
-import { ExpoSecureStore, mapLoginMethodParamsForUrl, StorageKeys, getClaims, setActiveStorage, setRefreshTimer, refreshToken } from '@kinde/js-utils';
-import React from 'react';
-import secrets from '@/secrets';
+import {
+  ExpoSecureStore,
+  mapLoginMethodParamsForUrl,
+  StorageKeys,
+  setActiveStorage,
+  setRefreshTimer,
+  refreshToken,
+} from "@kinde/js-utils";
+import secrets from "@/secrets";
 import { setLocalStorage } from "@/utils/services";
+import { fetchUserProfile } from "@/utils/helpers";
 
 maybeCompleteAuthSession();
 
 const KINDE_DOMAIN = secrets.YOUR_KINDE_ISSUER;
-const KINDE_REDIRECT_URL = 'exp://192.168.1.2:8081';
-const KINDE_CLIENT_ID = secrets.YOUR_KINDE_CLIENT_ID
+const KINDE_REDIRECT_URL = "exp://192.168.1.2:8081";
+const KINDE_CLIENT_ID = secrets.YOUR_KINDE_CLIENT_ID;
+
+export const store: ExpoSecureStore = new ExpoSecureStore();
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [code, setCode] = useState<string | null>(null);
 
-  const [code, setCode] = useState<string | null>('');
   const redirectUri =
-  KINDE_REDIRECT_URL ||
+    KINDE_REDIRECT_URL ||
     makeRedirectUri({
       native: Constants.isDevice,
-      path: "kinde_callback",
     });
 
-  const store: ExpoSecureStore = new ExpoSecureStore();
-  setActiveStorage(store);
+  useEffect(() => {
+    setActiveStorage(store);
+  }, []);
 
-  const authenticate = async (
-    options = {},
-  ) => {
-
-    // check if there is already a session
-    const accessToken = await store.getSessionItem(StorageKeys.accessToken);
-    
-    // valdate the token using validation library e.g. @kinde-oss/jwt-validator
-    // if the token is valid, the user is already logged in and can continue. 
-    // recommended to start the refresh timer, see example in exchangeCodeAsync callback below
-
-
-    const request = new AuthRequest({
-      clientId: KINDE_CLIENT_ID,
-      redirectUri,
-      scopes: ['openid','profile','email','offline'],
-      responseType: "code",
-      extraParams: {
-        has_success_page: "true",
-        ...mapLoginMethodParamsForUrl(options)
-      },
-    });
-
+  const authenticate = async (options = {}) => {
     try {
+      // Check if there is already a session
+      const accessToken = await store.getSessionItem(StorageKeys.accessToken);
+      if (accessToken) {
+        console.log("User is already logged in.");
+        return { success: true, accessToken };
+      }
+
+      const request = new AuthRequest({
+        clientId: KINDE_CLIENT_ID,
+        redirectUri,
+        scopes: ["openid", "profile", "email", "offline"],
+        responseType: "code",
+        extraParams: {
+          has_success_page: "true",
+          ...mapLoginMethodParamsForUrl(options),
+        },
+      });
+
       const codeResponse = await request.promptAsync(
         {
           authorizationEndpoint: `${KINDE_DOMAIN}/oauth2/auth`,
         },
         {
           showInRecents: true,
-        },
+        }
       );
-  
-      if (request && codeResponse?.type === "success") {
+
+      if (codeResponse?.type === "success") {
         const exchangeCodeResponse = await exchangeCodeAsync(
           {
             clientId: KINDE_CLIENT_ID!,
@@ -77,29 +86,36 @@ export default function LoginScreen() {
           },
           {
             tokenEndpoint: `${KINDE_DOMAIN}/oauth2/token`,
-          },
+          }
         );
-        setCode(exchangeCodeResponse.accessToken)
-   
-        await store.setSessionItem(StorageKeys.accessToken, exchangeCodeResponse.accessToken);
 
-        console.log(await getClaims());
+        setCode(exchangeCodeResponse.accessToken);
 
-        // Sets the refresh token in the secure store.
-        store.setSessionItem(
+        // Store the access token securely
+        await store.setSessionItem(
+          StorageKeys.accessToken,
+          exchangeCodeResponse.accessToken
+        );
+
+        // Fetch user profile
+        const userProfile:any = await fetchUserProfile();
+        if (userProfile?.email) {
+          await setLocalStorage("user", userProfile);
+        }
+
+        await store.setSessionItem(
           StorageKeys.refreshToken,
-          exchangeCodeResponse.refreshToken,
+          exchangeCodeResponse.refreshToken
         );
 
-        // This will start the token refresh, triggering the access and refresh tokens to be refreshed 10 seconds before the access token expires.
         setRefreshTimer(exchangeCodeResponse.expiresIn!, async () => {
-          refreshToken({
+          await refreshToken({
             domain: KINDE_DOMAIN,
             clientId: KINDE_CLIENT_ID,
           });
         });
 
-        setLocalStorage('login','true' as any)
+        await setLocalStorage("login", "true");
 
         return {
           success: true,
@@ -114,7 +130,6 @@ export default function LoginScreen() {
       return { success: false, errorMessage: err.message };
     }
   };
-  
 
   return (
     <SafeAreaView>
@@ -165,13 +180,12 @@ export default function LoginScreen() {
             marginTop: 20,
           }}
         >
-          Stay on Track. Event By Event:Your Personal Budget Planner App!
+          Stay on Track. Event By Event: Your Personal Budget Planner App!
         </Text>
 
         <TouchableOpacity
           onPress={() => {
-          authenticate({ prompt: "login" });
-
+            authenticate({ prompt: "login" });
           }}
           style={{
             backgroundColor: "white",

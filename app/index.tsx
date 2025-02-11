@@ -1,4 +1,4 @@
-import { getLocalStorage } from "@/utils/services";
+import { getLocalStorage, removeLocalStorage, setLocalStorage } from "@/utils/services";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -10,6 +10,7 @@ export default function Index() {
   const checkUser = async () => {
     try {
       const response = await getLocalStorage("login");
+
 
       if (!response) {
         router.replace("/login");

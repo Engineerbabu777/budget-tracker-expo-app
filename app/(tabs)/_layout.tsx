@@ -3,12 +3,14 @@ import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Colors from "@/utils/Colors";
 export default function HomeLayout() {
   return (
     <>
       <Tabs
         screenOptions={{
           headerShown: false,
+          tabBarActiveTintColor:Colors.Primary 
         }}
       >
         <Tabs.Screen
