@@ -2,12 +2,14 @@ import Colors from "@/utils/Colors";
 import { fetchUserProfile } from "@/utils/helpers";
 import React, { useEffect, useState } from "react";
 import { View, Text, Image } from "react-native";
-import {Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { getLocalStorage } from "@/utils/services";
 export default function Header() {
   const [user, setUser] = useState<any>(null);
   const getUserDetails = async () => {
     // Fetch user details and set it to local storage
-    const user = await fetchUserProfile();
+    // const user = await fetchUserProfile();
+    const user = await getLocalStorage("user-profile-budget-tracker");
     setUser(user);
     console.log({ user });
   };
@@ -22,8 +24,8 @@ export default function Header() {
         // backgroundColor: Colors.Primary,
         flexDirection: "row",
         alignItems: "center",
-        gap:10,
-        display:"flex"
+        gap: 10,
+        display: "flex",
       }}
     >
       <View>
@@ -36,18 +38,33 @@ export default function Header() {
           }}
         />
       </View>
-      <View style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexDirection:"row",
-        flex:1
-        // width:"80%"
-      }}>
+      <View
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexDirection: "row",
+          flex: 1,
+          // width:"80%"
+        }}
+      >
         <View>
-          <Text style={{ color: Colors.White, fontSize: 16 }}>Welcome,</Text>
           <Text
-            style={{ color: Colors.White, fontSize: 20, fontWeight: "bold" }}
+            style={{
+              color: Colors.White,
+              fontSize: 16,
+              fontFamily: "Outfit-Regular",
+            }}
+          >
+            Welcome,
+          </Text>
+          <Text
+            style={{
+              color: Colors.White,
+              fontSize: 20,
+              fontWeight: "bold",
+              fontFamily: "Outfit-Bold",
+            }}
           >
             {user?.first_name}
           </Text>

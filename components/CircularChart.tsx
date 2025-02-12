@@ -10,10 +10,7 @@ export default function CircularChart() {
   const widthAndHeight = 150;
 
   const series = [
-    { value: 430, color: "#fbd203" },
-    { value: 321, color: "#ffb300" },
-    { value: 185, color: "#ff9100" },
-    { value: 123, color: "#ff6c00" },
+    { value: 430, color: Colors.Gray },
   ];
 
   return (
