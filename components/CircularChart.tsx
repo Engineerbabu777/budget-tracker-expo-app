@@ -53,7 +53,7 @@ export default function CircularChart() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    marginTop: -50,
     elevation: 1,
     backgroundColor: Colors.White,
     borderRadius: 15,

@@ -4,8 +4,9 @@ import Colors from "@/utils/Colors";
 import { getLocalStorage } from "@/utils/services";
 import { supabase } from "@/utils/SupabseConfig";
 import React, { useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function Home() {
   const getAllVategories = async () => {
@@ -24,14 +25,45 @@ export default function Home() {
   return (
     <SafeAreaView
       style={{
-        backgroundColor: Colors.Primary,
+        // backgroundColor: Colors.Primary,
+        flex: 1,
       }}
     >
-      {/* Header! */}
-      <Header />
+      {/* <StatusBar barStyle={"light-content"}/> */}
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
+        {/* Header! */}
+        <Header />
 
-      {/* Chart! */}
-      <CircularChart />
+        {/* Chart! */}
+        <CircularChart />
+      </View>
+
+      <View
+        style={{
+          position: "absolute",
+          bottom: 20,
+          right: 20,
+          borderRadius: 99,
+
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          elevation: 5,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+        }}
+      >
+        <AntDesign name="pluscircle" size={54} color={Colors.Primary} />
+      </View>
     </SafeAreaView>
   );
 }

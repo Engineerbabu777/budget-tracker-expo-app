@@ -20,12 +20,16 @@ export default function Header() {
   return (
     <View
       style={{
-        padding: 10,
-        // backgroundColor: Colors.Primary,
+        paddingHorizontal: 10,
+        backgroundColor: Colors.Primary,
         flexDirection: "row",
         alignItems: "center",
         gap: 10,
         display: "flex",
+        height:150,
+        paddingTop:-10,
+        paddingBottom:40
+        
       }}
     >
       <View>
