@@ -4,11 +4,14 @@ import Colors from "@/utils/Colors";
 import { getLocalStorage } from "@/utils/services";
 import { supabase } from "@/utils/SupabseConfig";
 import React, { useEffect } from "react";
-import { View, Text, StatusBar } from "react-native";
+import { View, Text, StatusBar, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useRouter } from "expo-router";
 
 export default function Home() {
+  const router = useRouter();
+
   const getAllVategories = async () => {
     const user: any = await getLocalStorage("user-profile-budget-tracker");
 
@@ -42,7 +45,8 @@ export default function Home() {
         <CircularChart />
       </View>
 
-      <View
+      <Pressable
+        onPress={() => router.push("/add-new-category")}
         style={{
           position: "absolute",
           bottom: 20,
@@ -63,7 +67,7 @@ export default function Home() {
         }}
       >
         <AntDesign name="pluscircle" size={54} color={Colors.Primary} />
-      </View>
+      </Pressable>
     </SafeAreaView>
   );
 }
