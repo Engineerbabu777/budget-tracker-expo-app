@@ -1,3 +1,4 @@
+import CircularChart from "@/components/CircularChart";
 import Header from "@/components/header";
 import Colors from "@/utils/Colors";
 import { getLocalStorage } from "@/utils/services";
@@ -22,12 +23,15 @@ export default function Home() {
   }, []);
   return (
     <SafeAreaView
-    style={{
-      backgroundColor:Colors.Primary
-    }}
+      style={{
+        backgroundColor: Colors.Primary,
+      }}
     >
       {/* Header! */}
       <Header />
+
+      {/* Chart! */}
+      <CircularChart />
     </SafeAreaView>
   );
 }
