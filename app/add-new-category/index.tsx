@@ -1,6 +1,6 @@
 import ColorPicker from "@/components/COlorPicker";
 import Colors from "@/utils/Colors";
-import { FontAwesome6, Ionicons } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   View,
@@ -8,14 +8,41 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { supabase } from "@/utils/SupabseConfig";
 export default function AddNewCategory() {
   const [selectedIcon, setSelectedIcon] = useState("😊");
   const [selectedColor, setSelectedColor] = useState("red");
   const [categoryName, setCategoryName] = useState("");
-  const [budget, setBudget] = useState(0);
+  const [budget, setBudget] = useState<string | number | null>(null);
+
+  const onCreateCategory = async () => {
+    try {
+      const { error } = await supabase
+        .from("Category")
+        .insert({
+          name: categoryName,
+          created_by: "awaismumtaz0099@gmail.com",
+          color: selectedColor,
+          icon: selectedIcon,
+          assigned_budget: budget,
+        });
+
+      if (error) {
+        throw error; // Force error to be handled in catch
+      }
+
+      Alert.alert("Success", "Category created successfully!");
+    } catch (err: any) {
+      Alert.alert(
+        "Error",
+        err.message || "An error occurred while creating the category."
+      );
+    }
+  };
 
   return (
     <SafeAreaView
@@ -68,6 +95,7 @@ export default function AddNewCategory() {
           placeholder="Category name"
           style={styles.input}
           onChangeText={(text: string) => setCategoryName(text)}
+          value={categoryName}
         />
       </View>
 
@@ -84,11 +112,13 @@ export default function AddNewCategory() {
           style={styles.input}
           keyboardType="numeric"
           onChangeText={(num: string) => setBudget(Number(num))}
+          value={budget?.toString() ?? ""}
         />
       </View>
 
       {/* Button to Create */}
       <TouchableOpacity
+        onPress={onCreateCategory}
         style={{
           backgroundColor: Colors.Primary,
           padding: 15,
@@ -107,6 +137,7 @@ export default function AddNewCategory() {
           elevation: 5,
           marginBottom: 10,
         }}
+        disabled={!categoryName || !selectedIcon}
       >
         <Text style={{ color: Colors.White, fontWeight: "bold", fontSize: 16 }}>
           Create
