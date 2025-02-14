@@ -9,10 +9,11 @@ export default function RootLayout() {
     "Outfit-Regular": require("../assets/fonts/Outfit-Regular.ttf"),
   });
   return (
-    <Stack screenOptions={{
-      headerShown: false,
-
-    }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Stack.Screen
         name="(tabs)"
         options={{
@@ -25,7 +26,14 @@ export default function RootLayout() {
           presentation: "modal",
           headerShown: true,
           headerTitle: "Add New Category",
-        
+        }}
+      />
+      <Stack.Screen
+        name="add-new-item"
+        options={{
+          presentation: "modal",
+          headerShown: true,
+          headerTitle: "Add New Category",
         }}
       />
     </Stack>

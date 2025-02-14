@@ -187,7 +187,12 @@ const CategoryDetails = () => {
       </ScrollView>
       <View style={{}}>
         <Pressable
-          onPress={() => router.push("/add-new-item")}
+          onPress={() =>
+            router.push({
+              pathname: "/add-new-item",
+              params: { categoryId: category?.id },
+            })
+          }
           style={{
             position: "absolute",
             bottom: 20,
@@ -207,7 +212,7 @@ const CategoryDetails = () => {
             shadowRadius: 3.84,
           }}
         >
-          <AntDesign name="pluscircle" size={54} color={Colors.Primary} />
+          <AntDesign name="pluscircle" size={54} color={category.color} />
         </Pressable>
       </View>
     </SafeAreaView>
