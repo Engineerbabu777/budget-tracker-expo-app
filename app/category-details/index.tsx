@@ -1,4 +1,12 @@
-import { Pressable, ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/utils/SupabseConfig";
@@ -6,6 +14,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/utils/Colors";
 import CategoryItems from "@/components/CategoryItem";
+import { AntDesign } from "@expo/vector-icons";
 
 const CategoryDetails = () => {
   const { categoryId } = useLocalSearchParams();
@@ -62,6 +71,38 @@ const CategoryDetails = () => {
     getCategoryListById();
   }, [categoryId]);
 
+  const handleDeleteCategory = async () => {
+    Alert.alert(
+      "Delete Category",
+      "Are you sure you want to delete this category?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => deleteCategory(),
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const deleteCategory = async () => {
+    const { error } = await supabase
+      .from("Category")
+      .delete()
+      .eq("id", categoryId);
+
+    if (error) {
+      console.error("Error deleting category:", error);
+      return;
+    }
+
+    router.back();
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.loaderContainer}>
@@ -71,10 +112,11 @@ const CategoryDetails = () => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
         style={{
           paddingHorizontal: 10,
+          display: "flex",
         }}
       >
         <Pressable onPress={() => router.back()}>
@@ -121,7 +163,9 @@ const CategoryDetails = () => {
               </Text>
             </View>
 
-            <Ionicons name="trash" size={24} color="red" />
+            <Pressable onPress={handleDeleteCategory}>
+              <Ionicons name="trash" size={24} color="red" />
+            </Pressable>
           </View>
 
           {/* Progress bar! */}
@@ -141,6 +185,31 @@ const CategoryDetails = () => {
         {/* Category Items! */}
         <CategoryItems categoryItems={category?.CategoryList} />
       </ScrollView>
+      <View style={{}}>
+        <Pressable
+          onPress={() => router.push("/add-new-item")}
+          style={{
+            position: "absolute",
+            bottom: 20,
+            right: 20,
+            borderRadius: 99,
+
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+          }}
+        >
+          <AntDesign name="pluscircle" size={54} color={Colors.Primary} />
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 };
