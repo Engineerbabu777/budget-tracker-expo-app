@@ -8,22 +8,27 @@ import { View, Text, StatusBar, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
+import CategoryList from "@/components/CategoryList";
 
 export default function Home() {
   const router = useRouter();
 
-  const getAllVategories = async () => {
+  const [categoryList, setCategoryList] = React.useState<any>([]);
+
+  const getAllCategories = async () => {
     const user: any = await getLocalStorage("user-profile-budget-tracker");
 
     const { data, error } = await supabase
       .from("Category")
-      .select("*")
+      .select("*,CategoryList(*)")
       .eq("created_by", user?.preferred_email);
+
+      setCategoryList(data)
     console.log(data, error, user);
   };
 
   useEffect(() => {
-    getAllVategories();
+    getAllCategories();
   }, []);
   return (
     <SafeAreaView
@@ -43,6 +48,9 @@ export default function Home() {
 
         {/* Chart! */}
         <CircularChart />
+
+        {/* Category List! */}
+        <CategoryList categoryList={categoryList}/>
       </View>
 
       <Pressable
