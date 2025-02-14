@@ -1,16 +1,18 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/utils/SupabseConfig";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/utils/Colors";
+import CategoryItems from "@/components/CategoryItem";
 
 const CategoryDetails = () => {
   const { categoryId } = useLocalSearchParams();
   const [category, setCategory] = useState<any>(null);
   const [totalCost, setTotalCost] = useState(0);
   const [percent, setPercent] = useState(0);
+  const [loading, setLoading] = useState(true); // State for loader
 
   const router = useRouter();
 
@@ -36,9 +38,10 @@ const CategoryDetails = () => {
     if (category) {
       calulateProgress();
     }
-  }, [percent, totalCost,category]);
+  }, [percent, totalCost, category]);
 
   const getCategoryListById = async () => {
+    setLoading(true); // Start loading
     const { data, error } = await supabase
       .from("Category")
       .select("*,CategoryList(*)")
@@ -46,17 +49,27 @@ const CategoryDetails = () => {
 
     if (error) {
       console.error("Error fetching category:", error);
-
+      setLoading(false); // Stop loading on error
       return;
     }
 
     setCategory(data[0]);
+    setLoading(false); // Stop loading after data is fetched
   };
 
   useEffect(() => {
     if (!categoryId) return;
     getCategoryListById();
   }, [categoryId]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={Colors.Primary} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView>
       <ScrollView
@@ -124,6 +137,9 @@ const CategoryDetails = () => {
             ></View>
           </View>
         </View>
+
+        {/* Category Items! */}
+        <CategoryItems categoryItems={category?.CategoryList} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -132,6 +148,11 @@ const CategoryDetails = () => {
 export default CategoryDetails;
 
 const styles = StyleSheet.create({
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   categoryItem: {
     fontFamily: "Outfit-Regular",
     fontSize: 16,
@@ -143,7 +164,6 @@ const styles = StyleSheet.create({
   amountContainer: {
     display: "flex",
     justifyContent: "space-between",
-    // alignItems:"center",
     marginTop: 10,
     flexDirection: "row",
   },
