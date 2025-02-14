@@ -4,7 +4,14 @@ import Colors from "@/utils/Colors";
 import { getLocalStorage } from "@/utils/services";
 import { supabase } from "@/utils/SupabseConfig";
 import React, { useEffect } from "react";
-import { View, Text, StatusBar, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StatusBar,
+  Pressable,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
@@ -14,8 +21,10 @@ export default function Home() {
   const router = useRouter();
 
   const [categoryList, setCategoryList] = React.useState<any>([]);
+  const [loading, setLoading] = React.useState<any>(false);
 
   const getAllCategories = async () => {
+    setLoading(true);
     const user: any = await getLocalStorage("user-profile-budget-tracker");
 
     const { data, error } = await supabase
@@ -23,7 +32,8 @@ export default function Home() {
       .select("*,CategoryList(*)")
       .eq("created_by", user?.preferred_email);
 
-      setCategoryList(data)
+    setLoading(false);
+    setCategoryList(data);
     console.log(data, error, user);
   };
 
@@ -38,10 +48,13 @@ export default function Home() {
       }}
     >
       {/* <StatusBar barStyle={"light-content"}/> */}
-      <View
+      <ScrollView
         style={{
           flex: 1,
         }}
+        refreshControl={
+          <RefreshControl onRefresh={getAllCategories} refreshing={loading} />
+        }
       >
         {/* Header! */}
         <Header />
@@ -50,8 +63,8 @@ export default function Home() {
         <CircularChart />
 
         {/* Category List! */}
-        <CategoryList categoryList={categoryList}/>
-      </View>
+        <CategoryList categoryList={categoryList} />
+      </ScrollView>
 
       <Pressable
         onPress={() => router.push("/add-new-category")}

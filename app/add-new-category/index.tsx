@@ -13,15 +13,18 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { supabase } from "@/utils/SupabseConfig";
+import { useRouter } from "expo-router";
 export default function AddNewCategory() {
   const [selectedIcon, setSelectedIcon] = useState("😊");
   const [selectedColor, setSelectedColor] = useState("red");
   const [categoryName, setCategoryName] = useState("");
   const [budget, setBudget] = useState<string | number | null>(null);
 
+  const router = useRouter()
+
   const onCreateCategory = async () => {
     try {
-      const { error } = await supabase
+      const { error,data } = await supabase
         .from("Category")
         .insert({
           name: categoryName,
@@ -34,6 +37,11 @@ export default function AddNewCategory() {
       if (error) {
         throw error; // Force error to be handled in catch
       }
+
+      router.replace({
+        pathname: "/category-details",
+        params: { categoryId: data?.[0]?.id },
+      })
 
       Alert.alert("Success", "Category created successfully!");
     } catch (err: any) {

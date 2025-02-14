@@ -1,8 +1,10 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import Colors from "@/utils/Colors";
+import { useRouter } from "expo-router";
 
 export default function CategoryList({ categoryList }: { categoryList: any }) {
+  const router = useRouter();
   return (
     <View
       style={{
@@ -14,7 +16,7 @@ export default function CategoryList({ categoryList }: { categoryList: any }) {
         style={{
           fontSize: 25,
           fontFamily: "Outfit-Bold",
-          marginBottom:20
+          marginBottom: 20,
         }}
       >
         Latest Budget
@@ -23,7 +25,16 @@ export default function CategoryList({ categoryList }: { categoryList: any }) {
       <View>
         {categoryList?.map((category: any, index: number) => {
           return (
-            <View key={index} style={styles.container}>
+            <Pressable
+              key={index}
+              style={styles.container}
+              onPress={() =>
+                router.push({
+                  pathname: "/category-details",
+                  params: { categoryId: category.id},
+                })
+              }
+            >
               <View style={styles.iconContainer}>
                 <Text
                   style={[
@@ -35,14 +46,15 @@ export default function CategoryList({ categoryList }: { categoryList: any }) {
                 </Text>
               </View>
 
-              <View style={{
-                display:"flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "70%",
-                flexDirection: "row",
-                
-               }}>
+              <View
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "70%",
+                  flexDirection: "row",
+                }}
+              >
                 <View>
                   <Text style={styles.categoryText}>{category.name}</Text>
                   <Text style={styles.itemCount}>
@@ -50,15 +62,17 @@ export default function CategoryList({ categoryList }: { categoryList: any }) {
                   </Text>
                 </View>
                 <View>
-
-                <Text style={{
-                  fontSize: 17,
-                  fontFamily: "Outfit-Bold",
- 
-                }}>$5000</Text>
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontFamily: "Outfit-Bold",
+                    }}
+                  >
+                    $5000
+                  </Text>
                 </View>
               </View>
-            </View>
+            </Pressable>
           );
         })}
       </View>
@@ -82,7 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor:Colors.White,
+    backgroundColor: Colors.White,
     padding: 10,
     borderRadius: 15,
   },
