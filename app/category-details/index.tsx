@@ -9,8 +9,34 @@ import Colors from "@/utils/Colors";
 const CategoryDetails = () => {
   const { categoryId } = useLocalSearchParams();
   const [category, setCategory] = useState<any>(null);
+  const [totalCost, setTotalCost] = useState(0);
+  const [percent, setPercent] = useState(0);
 
   const router = useRouter();
+
+  const calulateProgress = () => {
+    if (!category) return 0;
+
+    const totalBudget = category?.assigned_budget;
+    const spentBudget = category?.CategoryList?.reduce(
+      (sum, item) => sum + item?.cost,
+      0
+    );
+
+    setTotalCost(spentBudget);
+
+    if (totalBudget === 0) {
+      setPercent(0);
+    } else {
+      setPercent(Math.round((spentBudget / totalBudget) * 100));
+    }
+  };
+
+  useEffect(() => {
+    if (category) {
+      calulateProgress();
+    }
+  }, [percent, totalCost,category]);
 
   const getCategoryListById = async () => {
     const { data, error } = await supabase
@@ -87,12 +113,16 @@ const CategoryDetails = () => {
 
           {/* Progress bar! */}
           <View style={styles?.amountContainer}>
-            <Text style={{ fontFamily: "Outfit-Regular" }}>$5000</Text>
+            <Text style={{ fontFamily: "Outfit-Regular" }}>${totalCost}</Text>
             <Text style={{ fontFamily: "Outfit-Regular" }}>
-              Assigned Budget: {category?.assigned_budget}
+              Assigned Budget: ${category?.assigned_budget}
             </Text>
           </View>
-          <View style={styles.progressBarMainContainer}></View>
+          <View style={styles.progressBarMainContainer}>
+            <View
+              style={[styles.progressBarsubcontainer, { width: `${percent}%` }]}
+            ></View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -121,5 +151,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 15,
     backgroundColor: Colors.Gray,
+    borderRadius: 99,
+    marginTop: 7,
+  },
+  progressBarsubcontainer: {
+    borderRadius: 99,
+    backgroundColor: Colors.Primary,
+    height: 15,
   },
 });
