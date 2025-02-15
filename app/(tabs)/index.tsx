@@ -60,7 +60,7 @@ export default function Home() {
         <Header />
 
         {/* Chart! */}
-        <CircularChart />
+        <CircularChart categoryList={categoryList}/>
 
         {/* Category List! */}
         <CategoryList categoryList={categoryList} />
