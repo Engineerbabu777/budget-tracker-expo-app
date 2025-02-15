@@ -1,8 +1,44 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Colors from "@/utils/Colors";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useRouter } from "expo-router";
+import { supabase } from "@/utils/SupabseConfig";
 
 const CategoryItems = ({ categoryItems }: { categoryItems: any }) => {
+  const router = useRouter();
+  const handleDeleteCategoryItem = (item: any) => {
+    Alert.alert(
+      "Delete Item",
+      "Are you sure you want to delete this Item?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            const { error } = await supabase
+              .from("CategoryList")
+              .delete()
+              .eq("id", item?.id);
+
+            if (error) {
+              console.error("Error deleting category:", error);
+              return;
+            }
+
+            router.replace({
+              pathname: "/category-details",
+              params: { categoryId: item.category_id },
+            });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Category Items</Text>
@@ -16,12 +52,13 @@ const CategoryItems = ({ categoryItems }: { categoryItems: any }) => {
                 <View>
                   <Image source={{ uri: item.url }} style={styles.image} />
                 </View>
-                <View style={{ flex: 1, marginLeft: 10 }}>
+                <View style={{ flex: 1, marginLeft: 10, gap: 2 }}>
                   <Text style={{ fontFamily: "Outfit-Bold", fontSize: 20 }}>
                     {item?.name}
                   </Text>
                   <Text
                     style={{ fontFamily: "Outfit-Regular", color: Colors.Gray }}
+                    numberOfLines={3}
                   >
                     {item?.url}
                   </Text>
@@ -36,12 +73,19 @@ const CategoryItems = ({ categoryItems }: { categoryItems: any }) => {
                   ${item.cost}
                 </Text>
               </View>
+              <Pressable
+                style={{ marginLeft: "auto" }}
+                onPress={() => handleDeleteCategoryItem(item)}
+              >
+                <MaterialIcons name="delete-forever" size={24} color="red" />
+              </Pressable>
               {index !== categoryItems.length - 1 && (
                 <View
                   style={{
                     height: 1,
                     backgroundColor: Colors.Gray,
                     marginTop: 10,
+                    marginBottom: 10,
                   }}
                 ></View>
               )}

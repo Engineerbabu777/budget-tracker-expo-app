@@ -5,6 +5,13 @@ import { useRouter } from "expo-router";
 
 export default function CategoryList({ categoryList }: { categoryList: any }) {
   const router = useRouter();
+
+
+  const calculateTotalCost = (categoryItems:any) => {
+    return categoryItems.reduce((total, item) => total + item.cost, 0);
+   return 0;
+  }
+
   return (
     <View
       style={{
@@ -68,7 +75,7 @@ export default function CategoryList({ categoryList }: { categoryList: any }) {
                       fontFamily: "Outfit-Bold",
                     }}
                   >
-                    $5000
+                    ${calculateTotalCost(category?.CategoryList)}
                   </Text>
                 </View>
               </View>
